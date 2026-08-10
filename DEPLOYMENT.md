@@ -18,8 +18,8 @@
 
 | Mục | Nội dung |
 |-----|----------|
-| Public URL | https://myapp.up.railway.app |
-| Platform | Railway |
+| Public URL | https://k4-day12-2a202601800-pham-tien-hung.onrender.com |
+| Platform | Render |
 | Ngày deploy | 2026-08-10 |
 
 ## Biến Môi Trường Đã Set Trên Cloud
