@@ -75,6 +75,22 @@ class ChatRequest(BaseModel):
     message: str = Field(min_length=1, max_length=2000)
 
 
+@app.get("/")
+def root():
+    """Trang mặc định của service khi mở Public URL trên trình duyệt."""
+    return {
+        "service": SERVICE_NAME,
+        "version": SERVICE_VERSION,
+        "status": "running",
+        "endpoints": {
+            "health": "/healthz",
+            "readiness": "/readyz",
+            "documentation": "/docs",
+            "chat": "POST /chat",
+        },
+    }
+
+
 # ─────────────────────────────────────────────────────────────
 # Health & readiness
 # ─────────────────────────────────────────────────────────────
