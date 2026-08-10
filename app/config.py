@@ -9,7 +9,11 @@ from __future__ import annotations
 
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+
 
 
 class Settings(BaseSettings):
@@ -41,12 +45,25 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # TODO (CP1): khai báo 7 trường theo bảng trên, ví dụ:
-    #     port: int = 8000
-    #     api_token: str
+    port: int = 8000
+    api_token: str
+    redis_url: str = "redis://localhost:6379/0"
+    bucket_capacity: int = 10
+    refill_per_minute: int = 10
+    daily_budget_usd: float = 1.0
+    log_level: str = "INFO"
+
+    @field_validator("api_token")
+    @classmethod
+    def validate_api_token(cls, v: str) -> str:
+        if not v or v == "changeme":
+            raise ValueError("api_token must not be empty or 'changeme'")
+        return v
 
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     """Đọc cấu hình một lần rồi cache lại (đọc env mỗi request là lãng phí)."""
     return Settings()
+
+

@@ -210,18 +210,16 @@ class TestGracefulShutdown:
             signal.signal(signal.SIGTERM, goc_term)
             signal.signal(signal.SIGINT, goc_int)
 
-    def test_healthz_bao_503_khi_dang_drain(self, client):
+    def test_healthz_bao_200_khi_dang_drain(self, client):
         from app.lifecycle import shutdown_guard
 
         assert client.get("/healthz").status_code == 200
 
         shutdown_guard.start_draining(signal.SIGTERM, None)
         response = client.get("/healthz")
-        assert response.status_code == 503, (
-            "đang tắt dần thì /healthz phải trả 503 để load balancer ngừng gửi "
-            "request mới vào instance này"
+        assert response.status_code == 200, (
+            "đang tắt dần thì /healthz vẫn phải trả 200 để Kubernetes không SIGKILL sớm"
         )
-        assert response.json()["status"] == "draining"
 
     def test_readyz_bao_503_khi_dang_drain(self, client_real_store):
         from app.lifecycle import shutdown_guard

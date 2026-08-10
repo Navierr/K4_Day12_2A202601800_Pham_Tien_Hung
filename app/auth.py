@@ -23,9 +23,10 @@ ANONYMOUS_CLIENT = "anonymous"
 SCHEME = "Bearer"
 
 
+from typing import Optional
 def verify_bearer_token(
-    authorization: str | None = Header(default=None),
-    x_client_id: str | None = Header(default=None),
+    authorization: Optional[str] = Header(default=None),
+    x_client_id: Optional[str] = Header(default=None),
 ) -> str:
     """Kiểm tra header ``Authorization``; trả về client_id nếu hợp lệ.
 
@@ -56,4 +57,28 @@ def verify_bearer_token(
          ``ANONYMOUS_CLIENT``. client_id này là đơn vị để rate limit và tính
          chi phí.
     """
-    raise NotImplementedError("TODO (CP3): cài đặt verify_bearer_token")
+    if not authorization:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="invalid or missing bearer token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    scheme, _, token = authorization.partition(" ")
+    if scheme.lower() != "bearer" or not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="invalid or missing bearer token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+        
+    if not secrets.compare_digest(token, get_settings().api_token):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="invalid or missing bearer token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+        
+    if x_client_id:
+        return x_client_id
+    return ANONYMOUS_CLIENT
