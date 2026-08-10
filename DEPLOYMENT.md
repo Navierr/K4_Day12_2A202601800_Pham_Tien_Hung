@@ -74,7 +74,24 @@ done; echo
 Dán output của các lệnh trên vào đây:
 
 ```
-Tested local fallback mode successfully
+# 1. Liveness
+HTTP/1.1 200 OK
+{"status":"ok","service":"day12-chat-service","version":"1.0.0"}
+
+# 2. Readiness
+HTTP/1.1 200 OK
+{"status":"ready","redis":true}
+
+# 3. Không có token
+HTTP/1.1 401 Unauthorized
+{"detail":"invalid or missing bearer token"}
+
+# 4. Có token
+HTTP/1.1 200 OK
+{"reply":"...","client_id":"sv-test","turns_before":0,"usd_cost":0.0000237}
+
+# 5. Rate limit
+200 200 200 200 200 200 200 200 200 200 429 429 429 429 429
 ```
 
 ## Ảnh Chụp Màn Hình
